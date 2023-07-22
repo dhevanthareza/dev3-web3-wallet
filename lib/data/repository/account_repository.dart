@@ -44,6 +44,15 @@ class AccountRepository {
     storage.write("accounts", jsonEncode(accountsJson));
   }
 
+  static void updateWholeWallet(List<WalletEntity> wallets) {
+    GetStorage storage = GetStorage();
+    storage.remove("accounts");
+    List<Map<String, dynamic>> accountsJson =
+        wallets.map((e) => e.toJson()).toList();
+
+    storage.write("accounts", jsonEncode(accountsJson));
+  }
+
   static void removeWallet() {
     GetStorage storage = GetStorage();
     storage.erase();

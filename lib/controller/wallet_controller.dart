@@ -1,24 +1,32 @@
+import 'dart:math';
+
 import 'package:dev3_wallet/data/repository/account_repository.dart';
 import 'package:dev3_wallet/entity/chain_entity.dart';
+import 'package:dev3_wallet/entity/token_entity.dart';
 import 'package:dev3_wallet/entity/wallet_entity.dart';
 import 'package:get/get.dart';
 
 import '../data/repository/chain_repository.dart';
 
 class WalletController extends GetxController {
+  static WalletController get to => Get.find();
+
   bool isInitializing = true;
   List<WalletEntity> wallets = [];
-  WalletEntity? currentActiveWallet;
-  ChainEntity? currentActiveChain;
+  int currentActiveWalletIndex = 0;
+  int currentActiveChainIndex = 0;
   double nativeBalance = 0;
+  String message = "";
+
+  Map<String, String> contractToBalance = {};
 
   @override
   void onInit() {
     // TODO: implement onInit
     super.onInit();
     wallets = [];
-    currentActiveChain = null;
-    currentActiveWallet = null;
+    currentActiveChainIndex = 0;
+    currentActiveWalletIndex = 0;
     initialize();
   }
 
@@ -31,23 +39,68 @@ class WalletController extends GetxController {
   Future<void> fetchWallets() async {
     List<WalletEntity> accounts = AccountRepository.fetchWallet();
     wallets = accounts;
-    currentActiveWallet = wallets[0];
-    currentActiveChain = currentActiveWallet!.chains[0];
+    currentActiveWalletIndex = 0;
+    currentActiveChainIndex = 0;
     update();
     fetchBalanceFromChain();
   }
 
   Future<void> fetchBalanceFromChain() async {
+    // Getting Native Balance
     nativeBalance = await ChainRepository.fetchBalanceFromChain(
-        currentActiveWallet!.privateKey!, currentActiveChain!);
+        wallets[currentActiveWalletIndex].privateKey!,
+        wallets[currentActiveWalletIndex].chains[currentActiveChainIndex]);
+
+    // Getting Another Token
+    wallets[currentActiveWalletIndex]
+        .chains[currentActiveChainIndex]
+        .tokens
+        .forEach((TokenEntity token) => fetchBalanceOfToken(
+              wallets[currentActiveWalletIndex].publicAddress!,
+              token,
+              wallets[currentActiveWalletIndex].chains[currentActiveChainIndex],
+            ));
     update();
   }
 
   Future<void> handleSelectNetwork(ChainEntity chain) async {
     Get.back();
-    currentActiveChain = chain;
+    int index = wallets[currentActiveWalletIndex].chains.indexWhere(
+          (ChainEntity item) => item.chainId == chain.chainId,
+        );
+    currentActiveChainIndex = index;
     nativeBalance = 0;
     update();
     fetchBalanceFromChain();
+  }
+
+  Future<void> addTokenToChain(TokenEntity token) async {
+    wallets[currentActiveWalletIndex]
+        .chains[currentActiveChainIndex]
+        .tokens
+        .add(token);
+    AccountRepository.updateWholeWallet(wallets);
+    update();
+
+    fetchBalanceOfToken(
+      wallets[currentActiveWalletIndex].publicAddress!,
+      token,
+      wallets[currentActiveWalletIndex].chains[currentActiveChainIndex],
+    );
+  }
+
+  Future<void> fetchBalanceOfToken(
+    String publicAddress,
+    TokenEntity token,
+    ChainEntity chain,
+  ) async {
+    String balance = await ChainRepository.fetchBalanceOfToken(
+      publicAddress,
+      token.contract!,
+      chain,
+    );
+    contractToBalance[token.contract!] =
+        (int.parse(balance) / pow(10, int.parse(token.decimal!))).toString();
+    update();
   }
 }

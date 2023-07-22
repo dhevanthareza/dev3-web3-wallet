@@ -15,17 +15,18 @@ class VerifyMnemonic extends StatefulWidget {
 class _VerifyMnemonicState extends State<VerifyMnemonic> {
   bool isVerified = false;
   String verificationText = '';
+  String walletNameText = '';
 
   void verifyMnemonic() {
-    // if (verificationText.trim() == widget.mnemonic.trim()) {
-    //   WalletService.generatePrivateKey();
-    //   setState(() {
-    //     isVerified = true;
-    //   });
-    // }
+    if (verificationText.trim() == widget.mnemonic.trim()) {
+      setState(() {
+        isVerified = true;
+      });
+    }
   }
 
-  void navigateToWalletPage() {
+  void navigateToWalletPage() async {
+    await WalletService.addWallet(verificationText, walletNameText);
     Get.to(WalletPage());
   }
 
@@ -56,6 +57,16 @@ class _VerifyMnemonicState extends State<VerifyMnemonic> {
                 labelText: 'Enter mnemonic phrase',
               ),
             ),
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  walletNameText = value;
+                });
+              },
+              decoration: const InputDecoration(
+                labelText: 'Give Your Wallet Nam',
+              ),
+            ),
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
@@ -67,6 +78,7 @@ class _VerifyMnemonicState extends State<VerifyMnemonic> {
             ElevatedButton(
               onPressed: isVerified ? navigateToWalletPage : null,
               style: ElevatedButton.styleFrom(
+                surfaceTintColor: Colors.white,
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
               ),
