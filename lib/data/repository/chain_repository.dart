@@ -16,7 +16,6 @@ class ChainRepository {
 
     var privateKey = EthPrivateKey.fromHex(address);
     EtherAmount balance = await ethClient.getBalance(privateKey.address);
-    print(balance.getValueInUnit(EtherUnit.ether));
     return balance.getValueInUnit(EtherUnit.ether);
   }
 
@@ -86,5 +85,15 @@ class ChainRepository {
         .call(contract: contract, function: balanceFunction, params: [address]);
 
     return balance[0].toString();
+  }
+
+  static Future<EtherAmount> fetchGasFee(
+      String privateAddress, ChainEntity chain) async {
+    var httpClient = Client();
+    var ethClient = Web3Client(chain.rpcUrl!, httpClient);
+
+    EtherAmount gasPrice = await ethClient.getGasPrice();
+    print(gasPrice.getValueInUnit(EtherUnit.ether).toString());
+    return gasPrice;
   }
 }

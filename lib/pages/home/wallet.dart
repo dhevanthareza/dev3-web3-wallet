@@ -2,6 +2,7 @@ import 'package:dev3_wallet/controller/wallet_controller.dart';
 import 'package:dev3_wallet/data/repository/account_repository.dart';
 import 'package:dev3_wallet/entity/token_entity.dart';
 import 'package:dev3_wallet/pages/home/components/add_custom_token.dart';
+import 'package:dev3_wallet/pages/home/components/send_token.dart';
 import 'package:dev3_wallet/pages/login.dart';
 import 'package:dev3_wallet/services/wallet_service.dart';
 import 'package:flutter/material.dart';
@@ -98,33 +99,38 @@ class _WalletPageState extends State<WalletPage> {
     return Row(
       children: [
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Color(0xFF141414).withOpacity(0.1),
-              borderRadius: BorderRadius.all(
-                Radius.circular(30),
+          child: InkWell(
+            onTap: () {
+              Get.bottomSheet(SendToken());
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Color(0xFF141414).withOpacity(0.1),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(30),
+                ),
               ),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(
-                  Icons.arrow_outward_rounded,
-                  color: Color(0xFF141414),
-                  size: 18,
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  "Send",
-                  style: TextStyle(
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.arrow_outward_rounded,
                     color: Color(0xFF141414),
-                    fontWeight: FontWeight.bold,
+                    size: 18,
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "Send",
+                    style: TextStyle(
+                      color: Color(0xFF141414),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -186,11 +192,7 @@ class _WalletPageState extends State<WalletPage> {
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                          color: e.chainId ==
-                                  state
-                                      .wallets[state.currentActiveWalletIndex]
-                                      .chains[state.currentActiveChainIndex]
-                                      .chainId
+                          color: e.chainId == state.currentActiveChain.chainId
                               ? const Color(0xFF141414).withOpacity(0.1)
                               : Colors.white,
                           borderRadius: BorderRadius.circular(15)),
@@ -243,7 +245,7 @@ class _WalletPageState extends State<WalletPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "${state.wallets[state.currentActiveWalletIndex].chains[state.currentActiveChainIndex].name} Chain",
+                    "${state.currentActiveChain.name} Chain",
                     style: TextStyle(color: Color(0xFF141414)),
                   ),
                   const SizedBox(
@@ -261,7 +263,7 @@ class _WalletPageState extends State<WalletPage> {
             height: 18,
           ),
           Text(
-            "${state.wallets[state.currentActiveWalletIndex].publicAddress}",
+            "${state.currentActiveWallet.publicAddress}",
             style: TextStyle(
               fontSize: 14.0,
               color: Colors.white.withOpacity(0.7),
@@ -271,7 +273,7 @@ class _WalletPageState extends State<WalletPage> {
             height: 4,
           ),
           Text(
-            "${state.wallets[state.currentActiveWalletIndex].chains[state.currentActiveChainIndex].symbol} ${state.nativeBalance}",
+            "${state.currentActiveChain.symbol} ${state.nativeBalance}",
             style: const TextStyle(
               fontSize: 20.0,
               color: Colors.white,
@@ -304,7 +306,7 @@ class _WalletPageState extends State<WalletPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "${state.wallets[state.currentActiveWalletIndex].chains[state.currentActiveChainIndex].symbol}",
+                "${state.currentActiveChain.symbol}",
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               const SizedBox(

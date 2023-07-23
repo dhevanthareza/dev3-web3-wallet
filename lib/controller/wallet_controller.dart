@@ -15,6 +15,11 @@ class WalletController extends GetxController {
   List<WalletEntity> wallets = [];
   int currentActiveWalletIndex = 0;
   int currentActiveChainIndex = 0;
+
+  WalletEntity get currentActiveWallet => wallets[currentActiveWalletIndex];
+  ChainEntity get currentActiveChain =>
+      wallets[currentActiveWalletIndex].chains[currentActiveChainIndex];
+
   double nativeBalance = 0;
   String message = "";
 
