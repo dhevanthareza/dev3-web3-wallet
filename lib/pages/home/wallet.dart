@@ -4,12 +4,8 @@ import 'package:dev3_wallet/entity/token_entity.dart';
 import 'package:dev3_wallet/pages/home/components/add_custom_token.dart';
 import 'package:dev3_wallet/pages/home/components/send_token.dart';
 import 'package:dev3_wallet/pages/login.dart';
-import 'package:dev3_wallet/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:path/path.dart';
-import 'package:web3dart/web3dart.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
@@ -228,36 +224,50 @@ class _WalletPageState extends State<WalletPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          InkWell(
-            onTap: () {
-              Get.bottomSheet(_buildChainBottomSheet());
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 8,
-                horizontal: 18,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "${state.currentActiveChain.name} Chain",
-                    style: TextStyle(color: Color(0xFF141414)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: () {
+                  Get.bottomSheet(_buildChainBottomSheet());
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 18,
                   ),
-                  const SizedBox(
-                    height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  Icon(
-                    Icons.keyboard_arrow_down,
-                    color: Color(0xFF141414),
-                  )
-                ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "${state.currentActiveChain.name} Chain",
+                        style: TextStyle(color: Color(0xFF141414)),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Color(0xFF141414),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+              InkWell(
+                onTap: () {
+                  state.fetchBalanceFromChain();
+                },
+                child: Icon(
+                  Icons.refresh,
+                  color: Colors.white,
+                ),
+              )
+            ],
           ),
           const SizedBox(
             height: 18,

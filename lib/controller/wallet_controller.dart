@@ -51,6 +51,7 @@ class WalletController extends GetxController {
   }
 
   Future<void> fetchBalanceFromChain() async {
+    print("FETCHING BALANCE");
     // Getting Native Balance
     nativeBalance = await ChainRepository.fetchBalanceFromChain(
         wallets[currentActiveWalletIndex].privateKey!,
@@ -66,6 +67,7 @@ class WalletController extends GetxController {
               wallets[currentActiveWalletIndex].chains[currentActiveChainIndex],
             ));
     update();
+    print("FETCHING BALAANCE DONE");
   }
 
   Future<void> handleSelectNetwork(ChainEntity chain) async {
@@ -99,13 +101,21 @@ class WalletController extends GetxController {
     TokenEntity token,
     ChainEntity chain,
   ) async {
+    print("Fetching Balance Of ${token.name}");
     String balance = await ChainRepository.fetchBalanceOfToken(
       publicAddress,
       token.contract!,
       chain,
     );
-    contractToBalance[token.contract!] =
-        (int.parse(balance) / pow(10, int.parse(token.decimal!))).toString();
+    contractToBalance[token.contract!] = (BigInt.parse(balance) /
+            BigInt.from(
+              pow(
+                10,
+                int.parse(token.decimal!),
+              ),
+            ))
+        .toString();
+    print("${token.name} balance is ${contractToBalance[token.contract!]}");
     update();
   }
 }

@@ -38,7 +38,7 @@ final List<ChainEntity> DEFAULT_CHAINS = [
   ),
   ChainEntity(
     name: "Mumbai Testnet",
-    rpcUrl: "https://polygon-mumbai-bor.publicnode.com",
+    rpcUrl: "https://polygon-mumbai.blockpi.network/v1/rpc/public",
     symbol: "MATIC",
     tokens: [],
     chainId: "80001",
